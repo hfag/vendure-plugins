@@ -28,6 +28,7 @@ export class CollectionLink extends VendureEntity {
 
   @ManyToOne(() => Collection, {
     onDelete: "CASCADE",
+    onUpdate: "CASCADE",
     nullable: false,
     eager: false,
   })

@@ -76,7 +76,7 @@ export class BulkDiscountService {
   findOne(
     ctx: RequestContext,
     recommendationId: number
-  ): Promise<BulkDiscount | undefined> {
+  ): Promise<BulkDiscount | null> {
     return this.connection
       .getRepository(ctx, BulkDiscount)
       .findOne({ where: { id: recommendationId }, loadEagerRelations: true });
@@ -118,7 +118,7 @@ export class BulkDiscountService {
       .update({ id }, { quantity, price });
   }
 
-  async delete(ids: ID[]): Promise<DeletionResponse> {
+  async delete(ctx: RequestContext, ids: ID[]): Promise<DeletionResponse> {
     try {
       await this.connection.rawConnection
         .createQueryBuilder()

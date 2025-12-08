@@ -59,7 +59,7 @@ const applyBulkDiscount = new PromotionItemAction({
   ],
   code: "bulk-discount",
   args: {},
-  execute: async function (ctx, orderItem, orderLine) {
+  execute: async function (ctx, orderLine) {
     if (!bulkDiscountService) {
       console.error(
         "bulkDiscountService has already been destroyed or not created yet. No discounts are applied."
@@ -158,17 +158,6 @@ const shopSchemaExtension = gql`
     config.promotionOptions.promotionConditions.push(always);
 
     config.promotionOptions.promotionActions.push(applyBulkDiscount);
-
-    config.customFields.ProductVariant.push({
-      name: "bulkDiscountEnabled",
-      type: "boolean",
-      public: true,
-      //in the shop api there is no function call for updating product variants
-      label: [
-        { languageCode: LanguageCode.en, value: "Has bulk discounts" },
-        { languageCode: LanguageCode.de, value: "Hat Mengenrabatte" },
-      ],
-    });
 
     return config;
   },

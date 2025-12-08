@@ -1,10 +1,5 @@
+import { VendurePlugin, PluginCommonModule, ID } from "@vendure/core";
 import gql from "graphql-tag";
-import {
-  VendurePlugin,
-  PluginCommonModule,
-  ID,
-  LanguageCode,
-} from "@vendure/core";
 
 import {
   ProductRecommendation,
@@ -87,16 +82,6 @@ const shopSchemaExtension = gql`
       ProductRecommendationEntityResolver,
       ProductEntityResolver,
     ],
-  },
-  configuration: (config) => {
-    config.customFields.Product.push({
-      type: "boolean",
-      name: "productRecommendationsEnabled",
-      label: [
-        { languageCode: LanguageCode.en, value: "Has product recommendations" },
-      ],
-    });
-    return config;
   },
 })
 export class ProductRecommendationsPlugin {}

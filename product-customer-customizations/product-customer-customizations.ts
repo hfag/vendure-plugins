@@ -21,7 +21,7 @@ const shopSchemaExtension = gql`
   },
   configuration: (config) => {
     config.customFields.Product.push({
-      type: "string",
+      type: "text",
       ui: {
         component: "json-editor-form-input",
       },
@@ -38,7 +38,7 @@ const shopSchemaExtension = gql`
       ],
     });
     config.customFields.OrderLine.push({
-      type: "string",
+      type: "text",
       name: "customizations",
       public: true,
       readonly: false,

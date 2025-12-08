@@ -6,6 +6,7 @@ import {
   Parent,
   ResolveField,
 } from "@nestjs/graphql";
+import { Permission } from "@vendure/common/lib/generated-types";
 import {
   Allow,
   Ctx,
@@ -15,14 +16,13 @@ import {
   Product,
   Transaction,
 } from "@vendure/core";
-import { Permission } from "@vendure/common/lib/generated-types";
+import { Translated } from "@vendure/core/dist/common/types/locale-types";
 
-import { ProductRecommendationService } from "./product-recommendations.service";
 import {
   RecommendationType,
   ProductRecommendation,
 } from "./product-recommendation.entity";
-import { Translated } from "@vendure/core/dist/common/types/locale-types";
+import { ProductRecommendationService } from "./product-recommendations.service";
 
 @Resolver()
 export class ProductRecommendationAdminResolver {
@@ -36,12 +36,14 @@ export class ProductRecommendationAdminResolver {
   async updateCrossSellingProducts(
     @Ctx() ctx: RequestContext,
     @Args() args: { productId: ID; productIds: [ID] }
-  ): Promise<Boolean> {
-    const recommendations: ProductRecommendation[] = await this.productRecommendationService.findAll(
-      {
-        where: { product: args.productId, type: RecommendationType.CROSSSELL },
-      }
-    );
+  ): Promise<boolean> {
+    const recommendations: ProductRecommendation[] =
+      await this.productRecommendationService.findAll(ctx, {
+        where: {
+          product: { id: args.productId },
+          type: RecommendationType.CROSSSELL,
+        },
+      });
 
     const recommendationsIds = recommendations.map((r) => r.recommendation.id);
 
@@ -52,8 +54,8 @@ export class ProductRecommendationAdminResolver {
       (r) => !recommendationsIds.includes(r)
     );
 
-    const promises: Promise<any>[] = toCreate.map((id) =>
-      this.productRecommendationService.create({
+    const promises: Promise<unknown>[] = toCreate.map((id) =>
+      this.productRecommendationService.create(ctx, {
         product: args.productId,
         recommendation: id,
         type: RecommendationType.CROSSSELL,
@@ -61,7 +63,7 @@ export class ProductRecommendationAdminResolver {
     );
 
     if (toDelete.length > 0) {
-      promises.push(this.productRecommendationService.delete(toDelete));
+      promises.push(this.productRecommendationService.delete(ctx, toDelete));
     }
 
     await Promise.all(promises);
@@ -75,10 +77,16 @@ export class ProductRecommendationAdminResolver {
   async updateUpSellingProducts(
     @Ctx() ctx: RequestContext,
     @Args() args: { productId: ID; productIds: ID[] }
-  ): Promise<Boolean> {
-    const recommendations = await this.productRecommendationService.findAll({
-      where: { product: args.productId, type: RecommendationType.UPSELL },
-    });
+  ): Promise<boolean> {
+    const recommendations = await this.productRecommendationService.findAll(
+      ctx,
+      {
+        where: {
+          product: { id: args.productId },
+          type: RecommendationType.UPSELL,
+        },
+      }
+    );
 
     const recommendationsIds = recommendations.map((r) => r.recommendation.id);
 
@@ -91,13 +99,13 @@ export class ProductRecommendationAdminResolver {
 
     await Promise.all([
       toCreate.map((id) =>
-        this.productRecommendationService.create({
+        this.productRecommendationService.create(ctx, {
           product: args.productId,
           recommendation: id,
           type: RecommendationType.UPSELL,
         })
       ),
-      this.productRecommendationService.delete(toDelete),
+      this.productRecommendationService.delete(ctx, toDelete),
     ]);
 
     return true;
@@ -109,8 +117,8 @@ export class ProductRecommendationAdminResolver {
     @Ctx() ctx: RequestContext,
     @Args() args: { productId: ID }
   ): Promise<ProductRecommendation[]> {
-    return await this.productRecommendationService.findAll({
-      where: { product: args.productId },
+    return await this.productRecommendationService.findAll(ctx, {
+      where: { product: { id: args.productId } },
     });
   }
 }
@@ -126,8 +134,8 @@ export class ProductRecommendationShopResolver {
     @Ctx() ctx: RequestContext,
     @Args() args: { productId: ID }
   ): Promise<ProductRecommendation[]> {
-    return await this.productRecommendationService.findAll({
-      where: { product: args.productId },
+    return await this.productRecommendationService.findAll(ctx, {
+      where: { product: { id: args.productId } },
     });
   }
 }
@@ -167,8 +175,8 @@ export class ProductEntityResolver {
     @Ctx() ctx: RequestContext,
     @Parent() product: Product
   ): Promise<ProductRecommendation[]> {
-    return this.productRecommendationService.findAll({
-      where: { product: product.id },
+    return this.productRecommendationService.findAll(ctx, {
+      where: { product: { id: product.id } },
     });
   }
 }

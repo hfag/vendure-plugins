@@ -13,16 +13,18 @@ export class ProductRecommendation extends VendureEntity {
     super(input);
   }
 
-  @ManyToOne((type) => Product, {
+  @ManyToOne(() => Product, {
     onDelete: "CASCADE",
+    onUpdate: "CASCADE",
     nullable: false,
     eager: true,
   })
   @JoinColumn()
   product: Product;
 
-  @ManyToOne((type) => Product, {
+  @ManyToOne(() => Product, {
     onDelete: "CASCADE",
+    onUpdate: "CASCADE",
     nullable: false,
     eager: true,
   })

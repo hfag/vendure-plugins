@@ -20,6 +20,7 @@ export class BulkDiscount extends VendureEntity {
 
   @ManyToOne(() => ProductVariant, {
     onDelete: "CASCADE",
+    onUpdate: "CASCADE",
     nullable: false,
     eager: true,
   })

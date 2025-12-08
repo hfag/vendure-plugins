@@ -60,7 +60,7 @@ export class BulkDiscountAdminResolver {
       }
 
       const discounts = await this.bulkDiscountService.findAll(ctx, {
-        where: { productVariant: discount.productVariantId },
+        where: { productVariant: { id: discount.productVariantId } },
       });
 
       for (const d of discount.discounts) {
@@ -121,7 +121,7 @@ export class BulkDiscountAdminResolver {
         })
       );
     }
-    promises.push(this.bulkDiscountService.delete(deletions));
+    promises.push(this.bulkDiscountService.delete(ctx, deletions));
 
     await Promise.all(promises);
 

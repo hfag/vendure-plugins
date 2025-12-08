@@ -18,6 +18,7 @@ export class CollectionLinkUrl extends VendureEntity implements Translatable {
 
   @ManyToOne(() => CollectionLink, {
     onDelete: "CASCADE",
+    onUpdate: "CASCADE",
     nullable: false,
     eager: false,
   })

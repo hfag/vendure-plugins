@@ -26,6 +26,8 @@ export class CollectionLinkUrlTranslation
 
   @ManyToOne(() => CollectionLinkUrl, (base) => base.translations, {
     onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+    nullable: false,
   })
   base: CollectionLinkUrl;
 

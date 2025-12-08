@@ -12,6 +12,7 @@ export class CollectionLinkAsset extends VendureEntity {
 
   @ManyToOne(() => CollectionLink, {
     onDelete: "CASCADE",
+    onUpdate: "CASCADE",
     nullable: false,
     eager: false,
   })
@@ -26,6 +27,7 @@ export class CollectionLinkAsset extends VendureEntity {
 
   @ManyToOne(() => Asset, {
     onDelete: "CASCADE",
+    onUpdate: "CASCADE",
     nullable: false,
     eager: false,
   })
