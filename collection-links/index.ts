@@ -4,7 +4,6 @@ import {
   PluginCommonModule,
   VendurePlugin,
 } from "@vendure/core";
-import { AdminUiExtensionSharedModule } from "@vendure/ui-devkit/compiler";
 import gql from "graphql-tag";
 
 import { CollectionLinkAsset } from "./collection-link-asset.entity";
@@ -59,12 +58,6 @@ export type UpdateCollectionLinkAssetInput = {
 export type UpdateCollectionLinkInput =
   | UpdateCollectionLinkUrlInput
   | UpdateCollectionLinkAssetInput;
-
-export const CollectionLinkInputModule: AdminUiExtensionSharedModule = {
-  type: "shared",
-  ngModuleFileName: "collection-links-input.module.ts",
-  ngModuleName: "CollectionLinkInputModule",
-};
 
 //extend product
 
