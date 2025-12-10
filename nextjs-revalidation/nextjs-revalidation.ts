@@ -4,6 +4,8 @@ import {
   EventBus,
   PluginCommonModule,
   ProductEvent,
+  ProductTranslation,
+  TransactionalConnection,
   Type,
   VendurePlugin,
 } from "@vendure/core";
@@ -21,7 +23,10 @@ export class NextJsRevalidation implements OnApplicationBootstrap {
   private static REVALIDATION_SECRET: string;
   private static REVALIDATION_URL: string;
 
-  constructor(private eventBus: EventBus) {}
+  constructor(
+    private eventBus: EventBus,
+    private connection: TransactionalConnection
+  ) {}
 
   static buildFetchUrl(type: string, languages: string[], slugs: string[]) {
     return `${NextJsRevalidation.REVALIDATION_URL}?secret=${
@@ -56,11 +61,21 @@ export class NextJsRevalidation implements OnApplicationBootstrap {
       ).catch(console.error);
     });
 
-    this.eventBus.ofType(ProductEvent).subscribe((event) => {
-      // do some action when this event fires
+    this.eventBus.ofType(ProductEvent).subscribe(async (event) => {
       const languages: string[] = [];
       const slugs: string[] = [];
-      event.entity.translations.forEach((t) => {
+
+      const translationRepository = this.connection.getRepository(
+        event.ctx,
+        ProductTranslation
+      );
+
+      // Fetch translation from the database to get the slugs
+      const translations = await translationRepository.find({
+        where: { base: { id: event.entity.id } },
+      });
+
+      translations.forEach((t) => {
         languages.push(t.languageCode);
         slugs.push(t.slug);
       });
