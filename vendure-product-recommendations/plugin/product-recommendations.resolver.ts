@@ -17,6 +17,7 @@ import {
   Transaction,
 } from "@vendure/core";
 import { Translated } from "@vendure/core/dist/common/types/locale-types";
+import { IsNull } from "typeorm";
 
 import {
   RecommendationType,
@@ -118,7 +119,10 @@ export class ProductRecommendationAdminResolver {
     @Args() args: { productId: ID }
   ): Promise<ProductRecommendation[]> {
     return await this.productRecommendationService.findAll(ctx, {
-      where: { product: { id: args.productId } },
+      where: {
+        product: { id: args.productId },
+        recommendation: { enabled: true, deletedAt: IsNull() },
+      },
     });
   }
 }
@@ -156,7 +160,7 @@ export class ProductRecommendationEntityResolver {
 
     if (!product) {
       throw new Error(
-        `Invalid database records for product recommendation with the id ${recommendation.id}`
+        `Invalid database records for product recommendation with the id ${recommendation.id} (product id ${recommendation.recommendation.id})`
       );
     }
 
@@ -176,7 +180,10 @@ export class ProductEntityResolver {
     @Parent() product: Product
   ): Promise<ProductRecommendation[]> {
     return this.productRecommendationService.findAll(ctx, {
-      where: { product: { id: product.id } },
+      where: {
+        product: { id: product.id },
+        recommendation: { enabled: true, deletedAt: IsNull() },
+      },
     });
   }
 }

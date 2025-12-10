@@ -1,4 +1,12 @@
-import { VendurePlugin, PluginCommonModule, ID } from "@vendure/core";
+import { OnModuleInit } from "@nestjs/common";
+import { DeletionResult } from "@vendure/common/lib/generated-types";
+import {
+  VendurePlugin,
+  PluginCommonModule,
+  ID,
+  EventBus,
+  ProductEvent,
+} from "@vendure/core";
 import gql from "graphql-tag";
 
 import {
@@ -84,4 +92,46 @@ const shopSchemaExtension = gql`
     ],
   },
 })
-export class ProductRecommendationsPlugin {}
+export class ProductRecommendationsPlugin implements OnModuleInit {
+  constructor(
+    private recommendationService: ProductRecommendationService,
+    private eventBus: EventBus
+  ) {}
+
+  onModuleInit() {
+    this.eventBus
+      .filter(
+        (event): event is ProductEvent =>
+          event instanceof ProductEvent && event.type === "deleted"
+      )
+      .subscribe(async (event) => {
+        const productEvent = event as ProductEvent;
+        const product = productEvent.entity;
+
+        const invalidRecommendationIds = await this.recommendationService
+          .findAll(productEvent.ctx, {
+            where: {
+              recommendation: {
+                id: product.id,
+              },
+            },
+            select: {
+              id: true,
+            },
+          })
+          .then((rs) => rs.map((r) => r.id));
+
+        const deleteResponse = await this.recommendationService.delete(
+          productEvent.ctx,
+          invalidRecommendationIds
+        );
+
+        if (deleteResponse.result === DeletionResult.NOT_DELETED) {
+          console.error(
+            `Could not delete product recommendations towards just deleted product!`,
+            deleteResponse.message
+          );
+        }
+      });
+  }
+}
