@@ -420,7 +420,7 @@ const extendedEmailVerificationHandler = emailVerificationHandler
     channelCode: "default",
     languageCode: LanguageCode.fr,
     templateFile: "body.fr.hbs",
-    subject: "E-Mail bestätigen",
+    subject: "Confirmez votre adresse e-mail",
   });
 
 const extendedPasswordResetHandler = passwordResetHandler
@@ -434,7 +434,7 @@ const extendedPasswordResetHandler = passwordResetHandler
     channelCode: "default",
     languageCode: LanguageCode.fr,
     templateFile: "body.fr.hbs",
-    subject: "Passwort zurücksetzen",
+    subject: "Réinitialiser le mot de passe",
   });
 const extendedEmailAddressChangeHandler = emailAddressChangeHandler
   .addTemplate({
@@ -447,7 +447,7 @@ const extendedEmailAddressChangeHandler = emailAddressChangeHandler
     channelCode: "default",
     languageCode: LanguageCode.fr,
     templateFile: "body.fr.hbs",
-    subject: "Neue E-Mail bestätigen",
+    subject: "Confirmez votre nouvelle adresse électronique",
   });
 
 export const emailHandlers: Array<EmailEventHandler<any, any>> = [
