@@ -354,21 +354,19 @@ const orderConfirmationCopyHandler = new EmailEventListener(
     return payment.metadata.copyEmail;
   })
   .setFrom("{{ fromAddress }}")
-  .setSubject("Order ({{ order.id }}) by {{ order.billingAddress.fullName }}")
+  .setSubject((event) => {
+    const language = event.ctx.languageCode;
+    if (language == LanguageCode.de) {
+      return "Bestellung ({{ order.id }}) von {{ order.billingAddress.fullName }}";
+    }
+
+    if (language == LanguageCode.fr) {
+      return "Commande ({{ order.id }}) de {{ order.billingAddress.fullName }}";
+    }
+
+    return "Order ({{ order.id }}) by {{ order.billingAddress.fullName }}";
+  })
   .setTemplateVars(orderSetTemplateVars)
-  .addTemplate({
-    channelCode: "default",
-    languageCode: LanguageCode.de,
-    templateFile: "body.de.hbs",
-    subject:
-      "Bestellung ({{ order.id }}) von {{ order.billingAddress.fullName }}",
-  })
-  .addTemplate({
-    channelCode: "default",
-    languageCode: LanguageCode.fr,
-    templateFile: "body.fr.hbs",
-    subject: "Commande ({{ order.id }}) de {{ order.billingAddress.fullName }}",
-  })
   .setMockEvent(mockOrderStateTransitionEvent);
 
 const orderConfirmationHandler = new EmailEventListener("order-confirmation")
@@ -389,66 +387,65 @@ const orderConfirmationHandler = new EmailEventListener("order-confirmation")
     return event.order.customer.emailAddress;
   })
   .setFrom("{{ fromAddress }}")
-  .setSubject(
-    'Confirmation for your order on {{ formatDate order.orderPlacedAt "dd.mm.yyyy" }}'
-  )
+  .setSubject((event) => {
+    const language = event.ctx.languageCode;
+    if (language == LanguageCode.de) {
+      return 'Bestätigung für ihre Bestellung vom {{ formatDate order.orderPlacedAt "dd.mm.yyyy" }}';
+    }
+
+    if (language == LanguageCode.fr) {
+      return 'Confirmation de votre commande du {{ formatDate order.orderPlacedAt "dd.mm.yyyy" }}';
+    }
+
+    return 'Confirmation for your order on {{ formatDate order.orderPlacedAt "dd.mm.yyyy" }}';
+  })
   .setTemplateVars(orderSetTemplateVars)
-  .addTemplate({
-    channelCode: "default",
-    languageCode: LanguageCode.de,
-    templateFile: "body.de.hbs",
-    subject:
-      'Bestätigung für ihre Bestellung vom {{ formatDate order.orderPlacedAt "dd.mm.yyyy" }}',
-  })
-  .addTemplate({
-    channelCode: "default",
-    languageCode: LanguageCode.fr,
-    templateFile: "body.fr.hbs",
-    subject:
-      'Confirmation de votre commande du {{ formatDate order.orderPlacedAt "dd.mm.yyyy" }}',
-  })
   .setMockEvent(mockOrderStateTransitionEvent);
 
-const extendedEmailVerificationHandler = emailVerificationHandler
-  .addTemplate({
-    channelCode: "default",
-    languageCode: LanguageCode.de,
-    templateFile: "body.de.hbs",
-    subject: "E-Mail bestätigen",
-  })
-  .addTemplate({
-    channelCode: "default",
-    languageCode: LanguageCode.fr,
-    templateFile: "body.fr.hbs",
-    subject: "Confirmez votre adresse e-mail",
-  });
+const extendedEmailVerificationHandler = emailVerificationHandler.setSubject(
+  (event) => {
+    const language = event.ctx.languageCode;
+    if (language == LanguageCode.de) {
+      return "E-Mail bestätigen";
+    }
 
-const extendedPasswordResetHandler = passwordResetHandler
-  .addTemplate({
-    channelCode: "default",
-    languageCode: LanguageCode.de,
-    templateFile: "body.de.hbs",
-    subject: "Passwort zurücksetzen",
-  })
-  .addTemplate({
-    channelCode: "default",
-    languageCode: LanguageCode.fr,
-    templateFile: "body.fr.hbs",
-    subject: "Réinitialiser le mot de passe",
-  });
-const extendedEmailAddressChangeHandler = emailAddressChangeHandler
-  .addTemplate({
-    channelCode: "default",
-    languageCode: LanguageCode.de,
-    templateFile: "body.de.hbs",
-    subject: "Neue E-Mail bestätigen",
-  })
-  .addTemplate({
-    channelCode: "default",
-    languageCode: LanguageCode.fr,
-    templateFile: "body.fr.hbs",
-    subject: "Confirmez votre nouvelle adresse électronique",
-  });
+    if (language == LanguageCode.fr) {
+      return "Confirmez votre adresse e-mail";
+    }
+
+    return "Confirm your email";
+  }
+);
+
+const extendedPasswordResetHandler = passwordResetHandler.setSubject(
+  (event) => {
+    const language = event.ctx.languageCode;
+    if (language == LanguageCode.de) {
+      return "Passwort zurücksetzen";
+    }
+
+    if (language == LanguageCode.fr) {
+      return "Réinitialiser le mot de passe";
+    }
+
+    return "Reset your password";
+  }
+);
+
+const extendedEmailAddressChangeHandler = emailAddressChangeHandler.setSubject(
+  (event) => {
+    const language = event.ctx.languageCode;
+    if (language == LanguageCode.de) {
+      return "Neue E-Mail bestätigen";
+    }
+
+    if (language == LanguageCode.fr) {
+      return "Confirmez votre nouvelle adresse électronique";
+    }
+
+    return "Confirm your email address";
+  }
+);
 
 export const emailHandlers: Array<EmailEventHandler<any, any>> = [
   orderConfirmationCopyHandler,
