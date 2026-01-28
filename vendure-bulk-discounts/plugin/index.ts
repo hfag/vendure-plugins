@@ -68,6 +68,11 @@ const applyBulkDiscount = new PromotionItemAction({
       return 0;
     }
 
+    // Only apply if there are no other discounts.
+    if (orderLine.discounts.length > 0) {
+      return 0;
+    }
+
     const discounts = await bulkDiscountService.findByProductVariantId(
       ctx,
       orderLine.productVariant.id
@@ -78,6 +83,8 @@ const applyBulkDiscount = new PromotionItemAction({
 
     return discount ? discount.price - orderLine.unitPrice : 0;
   },
+  // Evaluate last to avoid conflicts with other discounts
+  priorityValue: 10_000,
 });
 
 //extend product
